@@ -1,6 +1,6 @@
 ---
 layout: page
 title: Final Report
-permalink: /final_report/
+#permalink: /final_report/
 ---
 Hello world

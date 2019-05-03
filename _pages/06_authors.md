@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Authors
-permalink: /authors/
+#permalink: /authors/
 ---
 ## Margaux Bavlsik
 - Email <margauxbavlsik2019@u.northwestern.edu>

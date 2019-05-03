@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Project Goals
-permalink: /project_goals/
+#permalink: /project_goals/
 ---
 
 We will utilize Company ABC’s streaming data and our own modeling to accomplish the following:
