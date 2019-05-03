@@ -21,8 +21,8 @@ email: margauxbavlsik2019@u.northwestern.edu
 # email: tb.peters9@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   This is part of Northwestern University's MS in Data Science Capstone course. 
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://wrongpoison.github.io/chevron_capstone/" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/chevron_capstone" # the subpath of your site, e.g. /blog
+url: "https://wrongpoison.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  wrongpoison
 
 # Build settings
