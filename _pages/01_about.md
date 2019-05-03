@@ -1,7 +1,7 @@
 ---
 layout: page
 title: About
-permalink: chevron_capstone/about/
+permalink: {{ site.url }}/about/
 ---
 
 This is part of Northwestern University's MS in Data Science Capstone course. 
