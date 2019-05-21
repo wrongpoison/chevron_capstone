@@ -2,4 +2,87 @@
 layout: page
 title: Initial Findings
 ---
-Hello world
+- [Problem Statement and Project Scope](#problem-statement)
+- [Data](#data)
+    - [Data Overview](#data-overview)
+    - [Data Description](#data-description)
+    - [Data Preparation](#data-prep)
+- [Data Analysis](#data-analysis)
+- [Model Comparisons](#model-comparisons)
+- [Preliminary Conclusions](#preliminary-conclusions)
+- [Project Status](#project-status)
+- [Appendix](#appendix)
+
+
+
+## Problem Statement and Project Scope <a name="problem-statement">
+Six weeks ago, ABC Oil & Gas approached the project team to work on a solution for a very time consuming & inefficient task. This task is entering oil & gas well downtime. This task is currently performed each day manually by each field operator. This not only causes a field operator to enter data manually but also introduces a potential source for errors. The project team has been tirelessly working for the last four weeks on the problem to build a solution to reduce the manual data entry. This will enable the field operators to spend more time optimizing production as well as reduce data errors in the downtime System of Record (SoR), leading to higher quality lookbacks on well downtime.
+
+The solution that the project team will deliver will include the following:
+- A model that automatically codes ABC O&G’s well downtime based on alarm data
+- A dashboard that can make the lookback process easier, allowing users to identify opportunities of high downtime that need addressed
+- The python code that performed both the data preparation and modeling
+
+## Data <a name="data">
+### Data Overview <a name="data-overview">
+ew
+ABC oil and gas has provided a snapshot of data from both the SCADA alarm system and the downtime SoR. The alarm philosophy went through a major overhaul in mid-2017, which completely changed the alarm system and what sensors produce alarm values. Due to this, the data is only available starting in Q4 2017 through the end of Q1 2019. This data is housed in two separate tables: Alarm Data and Downtime Data. The Downtime Data table has approximately 215,000 records while the Alarm Data table has approximately 169,000 records. A data dictionary is included for reference in the appendix section.
+### Data Description <a name="data-description">
+The Alarm data describes events which triggered a SCADA alerting event. Each record is an alarm instance. There may be multiple alarms on the same day. Records have timestamps indicating the time the alarm fired, location and identifying information for the well for which the alarm fired, and the condition which caused the alarm to fire. By contrast, the Downtime Data table contains information filled out by operators to characterize interruptions to well production. Each day may have only a single downtime record. Records contain some identifying information regarding the well (though not as much as the alarm table), the type of well, the impact to production, and--most importantly for our purposes--categorization of the downtime by Tiers. There are four Tiers for each record and together they describe the unique downtime event.
+### Data Preparation <a name="data-prep">
+The team began preparing the product by cleaning the data. Upon reviewing the data, the team requested an additional table containing well identification data. This allowed the team to merge downtime and alarm data to examine what caused alarms to trigger. 
+Preliminary analysis did not indicate an obvious path for presenting and modeling the data, so we took two different approaches for cleaning the data. The project team thought this approach to be best as it will parallelize analysis of the same original data with different wrangling methods. In both approaches, records were removed from the downtime table which contained null values for any tier codes, as these rows indicate days where wells did not have any problems and produced gas all day. Records with subsurface downtime were also removed as there are no alarms associated with this type of well production failure. The next two sections discuss the next steps in wrangling for each clean dataset.
+### Data Cleaning Method 1: “Clean Dataset 1”
+In the first data cleaning approach, which will be referred to as clean dataset 1, we combined well fields to create a unique identifier for each well. This unique ID was made up of state, county code, and pad ID code. For preparing alarm data, we manipulated existing fields to create pad ID, equipment ID, and point code ID. These fields would then be incorporated into the model. We modified the timestamps to collapse different alarm types onto the same days.
+After manipulating the data into more useful objects, we merged alarm data and downtime data together based on pad ID and date. This allowed us to understand the combination of recorded events which ostensibly contributed to a well’s lack of productivity. We used one-hot encoding to describe the events associated with downtime and associated each type of event with a different integer value.
+#### Alarm data
+- Use text manipulation to split point id to a useable field. Used this to create a pad id, equipment id (eqp_id), and point code (pt_code) columns for use in model
+- Time stamp stripped form data/time column to allow collapse of alarm types on the same days
+Manually encoded some of the ‘Value’ column data. This column is unique in that it contains strings and numbers. The strings were separated out to its own column. The numbers were evaluating like this: 9999 (sensor points that are malfunctioned), less than 0 (i.e. negative values), greater than 0 (i.e. positive), and if equal to 0
+- The extracted string column from the `Value` column was then stripped of extraneous numbers, i.e. `Enumeration Value 5` and ‘Enumeration Value 1’ were changed to just `Enumeration Value`, and then encoded using the Pandas get dummy function.
+- Used pandas get dummy function to create dummy columns for: `point description`, `alarm condition`, `eqp_tag`, and `pt_code`.
+Downtime data created the same `pad_id` for previous two tables.
+Then we merged downtime and alarm data: 
+1After performing the above manipulations, the two tables were merged on date and pad ID. 
+1After the merge, the downtime labels were converted from string using sklearn OneHotEndoder, which converts each class to an integer. Each column was converted individually.
+1Depending on the model variant, the different tier encoded columns were concatenated and then encoded a second time. The encoders allow the encoded variables to be converted back to strings after the model predicts values
+This data cleaning method produces a final input matrix of approximately 8,300 records.
+### Data Cleaning Method 2: “Clean Dataset 2”
+The second method of data wrangling, which will be referred to as clean dataset 2, first created a dictionary for replacement within python which would take a unique identifier knows as “PUDNAME” and have it tied to a “padname” as well as a “well name”.  The “PUDNAME” ID is referenced in the alarm data and the well name is referenced in the downtime data, creating the dictionary will allow a replacement and unique refence to join the datasets on.  There was a significant amount of regular expression (regex) used to clean and process the text, which is a python package for manipulating and cleaning text. The same cleaning steps were taken on the other two datasets, downtime data and well data, as well to ensure a clean replacement across each dataset.  
+One challenge presented in merging this data is the data sets are recorded at different time intervals. When a join is made, not all of the data may be merged correctly due to the alarm data having timestamps and the downtime data only having a date field.  Another concern was that the duplication that could occur may interfere with the label encoding on the alarm data. After engaging the subject matter expert from ABC it was learned that alarms can cascade from an originating event, i.e. the main cause of the failure is from the first alarm that was recorded. With this new knowledge, a function was created that would window a buffer time and then index the first event and last event in a given time.  The function requires a user input of the time window for which to group the alarms. Four datasets were created with this function – 10 minute, 15 minute, 30 minute, and 60 minute grouped alarms. For the first pass analysis, the 60 minute grouped data will be used. Once the data was indexed the 140,000-row alarm dataset collapsed into a more manageable size of 18,000+ rows to join to the downtime data. The total number of records in the final input matrix using this method produces a similar number of records versus the method used to produce clean dataset 1– ~8,000.
+
+## Data Analysis<a name="data-analysis">
+After performing data cleaning and wrangling, some exploratory data analysis (EDA) was performed, gaining more familiarity and insight with the data. Next, several different modeling techniques were used in order to predict alarm causes. Three model types were implemented using Python for both datasets. The model types are deep neural net (DNN), decision tree, and LightGBM. Note that the decision tree and LightGBM use a technique called SMOTE to help with the class imbalance. The following sections discuss findings of the EDA process and high-level overviews of the first iterations of the models. Note that a section after each model will compare the three model types across the two datasets, so not all details are included about each model type & dataset in the specific model section.
+Exploratory Data Analysis
+Aside from obvious trends in the amount of lost production per category and season, the main finding was how imbalanced the classes of downtime are across the clean dataset. The third party down code accounts for over a third of the total downtime codes, and the second code only accounts for 18%. Due to this imbalance, the class distribution is difficult to show on a graph. As a work around, any unique combination of the tier 1, 2, & 3 codes that had less than 120 records was filtered out. The resulting data totals 6000 records, dropping ~2300 records from the clean data. There are 10 classes left in the pie chart out of the 177 total before filtering, showing that there are 167 classes across 2300 records, or about 13 records per class. The top ten classes shown in the pie chart average 600 records per class. This shows how skewed the overall class distribution is of the cleaned dataset. The pie chart below illustrates the top ten downtime code distribution.
+IMAGE
+#### Deep Neural Network (DNN)
+In our first attempt at modeling, we tried several variants of deep neural networks (DNN). The variations consisted primarily of differing input features and differing combinations of the response variables. For instance, we included at different times, all three downtime codes separated, all three downtime codes encoded, Tier Two and Tier Three codes separated, and Tier Two and Tier Three encoded. When referencing separated, we are discussing the raw down code value for the specific tier. All downtime codes are encoded regardless of combining or separating, and encoding means that we take the text representation and turn it into a numerical value for a model to use. Initial DNN models showed high overfitting of the training data, as illustrated below.
+IMAGE
+After several variations, the model with the highest balanced accuracy of ~8% predicted the Tier Two and Tier Three using the input features of the encoded point descriptions, encoded ‘Value’ columns, and encoded ‘pt_code’ values from the ‘clean dataset 1’. This resulted in 597 input features. However, as stated earlier, the large class imbalance prevented the model from converging. To circumvent this problem, an approach of removing the twenty percent of downtime codes with the fewest instances and kept only the top eighty. This resulted in the elimination of 1600 records, and only 14 of the original 177 combinations of Tier Two and Tier Three remained. This led to a model with an accuracy of approximately 45%. Different combinations of activation functions and nodes per layer were used through the model iterations. This technique was also implemented on ‘clean dataset 2’.
+Note that when scoring models, both accuracy and balanced accuracy is referenced as scoring metrics. Accuracy is simply the percentage of predicted data compared to test data that is correct. In classification predictions, however, this is not always a good reflection of how good the model is at predicting the correct values. This is where Balanced accuracy comes into play as it considers the predictions for each subclass. The image below helps illustrate this.
+IMAGE
+#### Decision Tree
+After the DNN, we attempted to implement a decision tree. We started again with all of the data, but then adjusted based on the class imbalance. Unlike the DNN where the clean data was truncated to the top 80%, with the decision tree was decided to try only the top 50 percent of the downtime data codes. This again produces models with low accuracy at only around 31% for ‘clean dataset 1’. As an effort to better deal with the class imbalance, we employed the Synthetic Minority Oversampling Technique (SMOTE) algorithm. SMOTE uses the techniques of bootstrapping in combination with k-nearest neighbor to take the rare events/classes in a dataset and balance the overall class distribution. With this procedure, a model with a balanced accuracy of 24 percent.
+
+#### LightGBM
+Lastly, we created a LightGBM model. LightGBM is a gradient boosting tool which uses tree-based learning algorithms. We again combined instances of Tier Two and Tier Three downtime codes and used the most frequently appearing eighty percent. We also employed the SMOTE algorithm to deal with class imbalances. This model was first tested with the ‘clean dataset 2’ and showed promising results. By combining SMOTE with the LightGBM model a balanced accuracy of 41 percent was achieved.
+
+#### Model Comparisons <a name="model-comparisons">
+Each of the three model types was constructed for each dataset – clean dataset 1 & clean dataset 2 – and both the accuracy and balanced accuracy metrics were calculated. A summary table is shown below for each of the models and metrics.
+IMAGE
+From this table it can be seen that the models don’t typically score more than 50% accuracy or balanced accuracy. From these first pass models, though, it appears that the decision tree and LightGBM perform better than the DNN. The project team has agreed to refine the decision tree and LightGBM models. A future decision will be made for which dataset to use after more iterations of modeling to allow proper assessment of model accuracy.
+
+## Preliminary Conclusions <a name="preliminary-conclusions">
+One thing that has become clear through examination and manipulation of the data is that the different “Tiers” for describing well outages reveal surprisingly little. Most of the outages are caused by one combination of three different codes. The third party down code accounts for over a third of the total downtime codes, and the second code only accounts for 18%.
+While we created three working models, the accuracy would not be as great as pre-populating the operator’s log with some of the most common downtime Tiers. If most of the outages can be characterized using identical parameters, it suggests that the system for collecting data may be fundamentally flawed. While engineers must still fill out many fields in the SoR, the records appear relatively homogenous, despite the large number of unique codes. This suggests that one of two things may be happening: either the events causing outages are all relatively similar--in which case, the application ought to auto-populate fields with the most-likely outcome. Or, the myriad fields operators must fill out do not accurately describe the differences between outage events. If this were the case, the data collection for the SoR might be reconsidered.
+While continuing development on the model, we have also begun developing different dashboards targeted at a few audicences within the organization. We have identified two main groups to present these dashboards to: executive leadership and field operations. There is a clear distinction between functionality and level of detail that is appropriate in the creation of each dashboard. Our executive level dashboard is focused on overall performance and allows the CEO and other executives to quickly review year over year performance and identify problematic geographies. Identifying specific regions will allow targeted resource utilization to stabilize operations.
+
+## Project Status <a name="project-status">
+Our project status is healthy and on-track for our June deliverable. We experienced our first hiccup as we were going through the EDA / Data wrangling phase, but we built our project plan to accommodate unforeseen challenges along the way. Due to this careful planning we are still projecting to meet all of our future deliverables. While modeling continues to sit atop of our priority list, part of the team will begin focusing more time to continued development of our executive and operational dashboards along with a supplementary mobile application.
+
+
+## Appendix <a name="appendix">
+IMAGES
+
+FIGURES
