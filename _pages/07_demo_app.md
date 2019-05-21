@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Model Demo Application
+title: Demo App
 ---
 
 This application demonstrates how our model performs given certain information.
