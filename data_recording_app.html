@@ -9,36 +9,85 @@
 
 <h1>Data Recording Application</h1>
 <p>This table demonstrates our model's predictions based on different inputs.</p>
-<form>
-  <input type="radio" name="gender" value="male" checked> Male<br>
-  <input type="radio" name="gender" value="female"> Female<br>
-  <input type="radio" name="gender" value="other"> Other
-</form>
 
-<select name="cars">
-  <option value="volvo">Volvo</option>
-  <option value="saab">Saab</option>
-  <option value="fiat">Fiat</option>
-  <option value="audi">Audi</option>
+<select name="Season">
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+</select>
+
+<select name="Field">
+  <option value="flow-rate">Brown</option>
+  <option value="esd">Cantaral</option>
+  <option value="flow-temp">Clyde</option>
+  <option value="separator-press">Davis</option>
+  <option value="tubing-press">Elders Ridge</option>
+  <option value="lel">Fort Beeler</option>
+  <option value="water-density">Herminie</option>
+  <option value="oil-density">Pritts</option>
+  <option value="line-press">Salem</option>
+  <option value="line-press">Shamrock</option>
+  <option value="line-press">Wicks</option>
+</select>
+
+<select name="eqp_tag">
+  <option value="GM01">GM01</option>
+  <option value="GM02">GM02</option>
+  <option value="GM03">GM03</option>
+  <option value="GM04">GM04</option>
+  <option value="GM05">GM05</option>
+  <option value="GM06">GM06</option>
+  <option value="GM07">GM07</option>
+  <option value="GM08">GM08</option>
+  <option value="GM09">GM09</option>
+  <option value="GM10">GM10</option>
+  <option value="GM11">GM11</option>
+</select>
+
+<select name="Alarm Condition">
+  <option value="ann-pressure">Annulus pressure</option>
+  <option value="esd">BMS alarm</option>
+  <option value="esd">BMS status</option>
+  <option value="esd">Bypass</option>
+  <option value="esd">Casing pressure</option>
+  <option value="esd">Comm state</option>
+  <option value="esd">Density oil</option>
+  <option value="esd">Density water</option>
+  <option value="esd">Diff pressure</option>
+  <option value="esd">ESD</option>
+  <option value="esd">Flow rate</option>
+  <option value="esd">Flow temperature</option>
+  <option value="glycol">Glycol level</option>
+  <option value="lel">LEL</option>
+  <option value="esd">Line pressure</option>
+  <option value="esd">OVM condensate static pressure</option>
+  <option value="esd">OVM density oil</option>
+  <option value="esd">Separator pressure</option>
+  <option value="esd">Static pressure</option>
+  <option value="esd">Status</option>
+  <option value="esd">Tubing pressure</option>
+  <option value="esd">Water volume</option>
+  <option value="esd">Well flow rate alarm</option>
   <input type="submit" value="Submit">
   <input type="reset">
 </select>
 
-<table style="width:90%">
+<table >
   <tr>
-    <th>Firstname</th>
-    <th>Lastname</th> 
-    <th>Age</th>
+    <th>Output</th>
+    <th>Output certainty</th> 
+    <th>Actual Result</th>
   </tr>
   <tr>
-    <td>Jill</td>
-    <td>Smith</td> 
-    <td>50</td>
+    <td>Industrial action</td>
+    <td>80%</td> 
+    <td>Industrial action</td>
   </tr>
   <tr>
-    <td>Eve</td>
-    <td>Jackson</td> 
-    <td>94</td>
+    <td>Misc - Other</td>
+    <td>64%</td> 
+    <td>Industrial action</td>
   </tr>
 </table>
 
