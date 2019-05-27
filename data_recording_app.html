@@ -2,7 +2,10 @@
 <html>
 <head>
 <link rel="stylesheet" href="/chevron_capstone/assets/main.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="/chevron_capstone/scripts/model_app.js"></script>
+
 <title>Demo application</title>
 </head>
 <body>
@@ -10,84 +13,49 @@
 <h1>Data Recording Application</h1>
 <p>This table demonstrates our model's predictions based on different inputs.</p>
 
-<select name="Season">
+<p>Season
+<select id="season"><p>Season</p>
   <option value="1">1</option>
   <option value="2">2</option>
   <option value="3">3</option>
   <option value="4">4</option>
-</select>
+</select></p>
 
-<select name="Field">
-  <option value="flow-rate">Brown</option>
-  <option value="esd">Cantaral</option>
-  <option value="flow-temp">Clyde</option>
-  <option value="separator-press">Davis</option>
-  <option value="tubing-press">Elders Ridge</option>
-  <option value="lel">Fort Beeler</option>
-  <option value="water-density">Herminie</option>
-  <option value="oil-density">Pritts</option>
-  <option value="line-press">Salem</option>
-  <option value="line-press">Shamrock</option>
-  <option value="line-press">Wicks</option>
+<p>Field
+<select id="field">
+  <option value="brown">Brown</option>
+  <option value="cantaral">Cantaral</option>
+  <option value="davis">Davis</option>
+  <option value="e_ridge">Elders Ridge</option>
+  <option value="f_beeler">Fort Beeler</option>
+  <option value="herminie">Herminie</option>
+  <option value="shamrock">Shamrock</option>
+  <option value="wicks">Wicks</option>
 </select>
+</p>
 
-<select name="eqp_tag">
-  <option value="GM01">GM01</option>
-  <option value="GM02">GM02</option>
-  <option value="GM03">GM03</option>
-  <option value="GM04">GM04</option>
-  <option value="GM05">GM05</option>
-  <option value="GM06">GM06</option>
-  <option value="GM07">GM07</option>
-  <option value="GM08">GM08</option>
-  <option value="GM09">GM09</option>
-  <option value="GM10">GM10</option>
-  <option value="GM11">GM11</option>
-</select>
-
-<select name="Alarm Condition">
-  <option value="ann-pressure">Annulus pressure</option>
-  <option value="esd">BMS alarm</option>
-  <option value="esd">BMS status</option>
-  <option value="esd">Bypass</option>
-  <option value="esd">Casing pressure</option>
-  <option value="esd">Comm state</option>
-  <option value="esd">Density oil</option>
-  <option value="esd">Density water</option>
-  <option value="esd">Diff pressure</option>
+<p>Alarm condition
+<select id="alarm">
+  <option value="bms_status">BMS status</option>
+  <option value="density_oil">Density oil</option>
+  <option value="dens_water">Density water</option>
   <option value="esd">ESD</option>
-  <option value="esd">Flow rate</option>
-  <option value="esd">Flow temperature</option>
-  <option value="glycol">Glycol level</option>
-  <option value="lel">LEL</option>
-  <option value="esd">Line pressure</option>
-  <option value="esd">OVM condensate static pressure</option>
-  <option value="esd">OVM density oil</option>
-  <option value="esd">Separator pressure</option>
-  <option value="esd">Static pressure</option>
-  <option value="esd">Status</option>
-  <option value="esd">Tubing pressure</option>
-  <option value="esd">Water volume</option>
-  <option value="esd">Well flow rate alarm</option>
-  <input type="submit" value="Submit">
-  <input type="reset">
+  <option value="flow_rate">Flow rate</option>
+  <option value="flow_temp">Flow temperature</option>
+  <option value="line_press">Line Pressure</option>
+  <option value="sep_press">Separator pressure</option>
+  </p>
+
+  <input type="submit" value="Submit" id="submit" onclick="submit_form()">
+  <input type="reset" submit="reset" onclick="reset_form()">
 </select>
 
 <table >
   <tr>
-    <th>Output</th>
-    <th>Output certainty</th> 
-    <th>Actual Result</th>
+    <th>Model Result</th>
   </tr>
   <tr>
-    <td>Industrial action</td>
-    <td>80%</td> 
-    <td>Industrial action</td>
-  </tr>
-  <tr>
-    <td>Misc - Other</td>
-    <td>64%</td> 
-    <td>Industrial action</td>
+    <td id="output">Industrial action</td>
   </tr>
 </table>
 
