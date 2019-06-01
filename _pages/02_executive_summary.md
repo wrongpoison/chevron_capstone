@@ -75,7 +75,3 @@ The project team has delivered a viable algorithm to predict well downtime. This
 5. Begin collecting real-time production data. Coupling the real-time alarm and production data would enable the algorithms to better identify the important alarms by informing the model when production was down and knowing that the alarms preceding this event are what should inform the model to identify the downtime code. (See Figure 9 illustration.)
 
 ![Project goals](../../assets/alarm_data.png)
-
-The cycle of the model can be seen in Figure 10, including future enhancement implementations.
-
-![Project goals](../../assets/project_cycle.png)
