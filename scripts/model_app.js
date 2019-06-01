@@ -23,14 +23,15 @@ function initialize() {
 function handleQueryResponse(response) {
   // Called when the query response is returned.
   if (response.isError()){
-      alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+      console.log('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
       return;
   }
   var data = response.getDataTable();
-  console.log(data);
-  var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-  chart.draw(data, {width: 400, height:300, is3D: true});
-  chart.draw(data, null);
+  console.log("Data: " + data);
+  //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+  //chart.draw(data, {width: 400, height:300, is3D: true});
+  //chart.draw(data, null);
+  return data;
 }
 
 google.setOnLoadCallback(initialize);
@@ -43,19 +44,21 @@ google.setOnLoadCallback(initialize);
 
 
 function query_google_sheets(season, field, alarm){
-    sheet_name = "https://docs.google.com/spreadsheets/d/18FBlbVwB_dDpCnvruQ2WjHOtgzxufBYTsn3IMTEPLmg/edit#gid=1361174674";
-    sheet_gid = "1361174674"
-    key="18FBlbVwB_dDpCnvruQ2WjHOtgzxufBYTsn3IMTEPLmg"
-    //query="https://spreadsheets.google.com/tq?tqx=out:html&tq=SELECT%20K%20WHERE%20E%20CONTAINS%20%27" + alarm + "%27%20AND%20I%20CONTAINS%20%27" + season + "%27%20AND%20J%20CONTAINS%20%27" + field + "%27";
+    
+    sheet_name = "https://spreadsheets.google.com/tq?&tq=&key=1u4gPK5jV2ZJ2_qft2uc_DlKvr8zNgaKt5QD2efcKtko";
+    //sheet_gid = "294463958";
+    //key="1u4gPK5jV2ZJ2_qft2uc_DlKvr8zNgaKt5QD2efcKtko";
+
     var query = new google.visualization.Query(sheet_name);
-    query.setQuery('select K, WHERE E contains ' + alarm + ' limit 1');
+    query.setQuery("select J limit 1");
     console.log(query);
-    query.send(handleQueryResponse);
-    //gviz/tq?tq=query
+    response = query.send(handleQueryResponse);
+    console.log(response);
+    return response;
+    // //gviz/tq?tq=query
 
-    console.log(query);
-    console.log("https://spreadsheets.google.com/tq?tqx=out:html&tq=SELECT%20K%20WHERE%20E%20CONTAINS%20%27bms_status%27")
-
+    //query = "https://spreadsheets.google.com/tq?tqx=out:html&tq=select%20J%20where%20I%20contains%20%22Shamrock%22%20AND%20H%20contains%20%224%22%20limit%201&key=1u4gPK5jV2ZJ2_qft2uc_DlKvr8zNgaKt5QD2efcKtko";
+    //console.log(query);
 }
 
 function submit_form(){
@@ -65,9 +68,13 @@ function submit_form(){
     console.log("season: " + season);
     console.log("field: " + field);
     console.log("alarm: " + alarm);
-    query_google_sheets(season, field, alarm);
+    prediction = query_google_sheets(season, field, alarm);
+    console.log(prediction);
 
-    $('#output').html("test val");
+    //Case statements for web app
+    var output_codes = ["Misc - Other", "Industrial Action", "Repair/Failure", "Weather/Seas"];
+    prediction = output_codes[Math.floor(Math.random()*output_codes.length)];
+    $('#output').html(prediction);
 };
 
 function reset_form(){
