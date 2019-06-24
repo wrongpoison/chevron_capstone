@@ -10,8 +10,7 @@ title: Authors
 
 ## Zachary Densmore
 <zacharydensmore2019@u.northwestern.edu>
-[Personal site][http://company.com]
-[Twitter][some_twitter]
+
 
 ## Tyler Peters
 <tb.peters9@gmail.com>
